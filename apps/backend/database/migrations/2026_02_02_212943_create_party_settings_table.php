@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('party_settings', function (Blueprint $table) {
             $table->id();
             $table->string('title')->default('🎉 PartySnap');
-            $table->text('subtitle')->default('Comparte tus mejores momentos');
+            $table->string('subtitle', 1000)->default('Comparte tus mejores momentos');
             $table->date('event_date')->nullable();
             $table->timestamps();
         });
