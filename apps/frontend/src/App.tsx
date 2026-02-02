@@ -4,12 +4,20 @@ import { Admin } from './views/Admin';
 
 function App() {
   const pathname = window.location.pathname;
+  
+  // Extract subdirectory if exists
+  // Development: '' (empty)
+  // Production: '/party-snap'
+  const basename = pathname.startsWith('/party-snap') ? '/party-snap' : '';
+  
+  // Get relative route (without subdirectory)
+  const route = basename ? pathname.replace('/party-snap', '') : pathname;
 
-  if (pathname === '/live') {
+  if (route === '/live') {
     return <TVMode />;
   }
 
-  if (pathname === '/admin') {
+  if (route === '/admin') {
     return <Admin />;
   }
 
