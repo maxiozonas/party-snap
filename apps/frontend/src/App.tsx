@@ -1,11 +1,16 @@
 import { Home } from './views/Home';
 import { TVMode } from './views/TVMode';
+import { Admin } from './views/Admin';
 
 function App() {
-  const isTVMode = window.location.pathname === '/live';
+  const pathname = window.location.pathname;
 
-  if (isTVMode) {
+  if (pathname === '/live') {
     return <TVMode />;
+  }
+
+  if (pathname === '/admin') {
+    return <Admin />;
   }
 
   return <Home />;

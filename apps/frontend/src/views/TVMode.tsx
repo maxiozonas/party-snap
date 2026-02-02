@@ -1,20 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePhotos } from '@/hooks/use-photos';
+import { usePhotoStream } from '@/hooks/use-photo-stream';
 
 export function TVMode() {
-  const { photos } = usePhotos(true);
+  const { photos, mutate } = usePhotos(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [initialized, setInitialized] = useState(false);
+  const lastPhotoCountRef = useRef(0);
+
+  usePhotoStream({
+    onNewPhotos: () => {
+      console.log('📸 Nuevas fotos detectadas - Actualizando slideshow...');
+      mutate();
+    },
+  });
 
   useEffect(() => {
-    if (photos.length === 0) return;
+    if (photos.length > 0 && !initialized) {
+      lastPhotoCountRef.current = photos.length;
+      requestAnimationFrame(() => setInitialized(true));
+    }
+  }, [photos.length, initialized]);
+
+  useEffect(() => {
+    if (photos.length === 0 || !initialized) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % photos.length);
+      setCurrentIndex((prev) => {
+        const nextIndex = (prev + 1) % photos.length;
+        console.log(`🖼️ Mostrando foto ${nextIndex + 1}/${photos.length}`);
+        return nextIndex;
+      });
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [photos.length]);
+  }, [photos.length, initialized]);
+
+  useEffect(() => {
+    if (photos.length > lastPhotoCountRef.current && initialized) {
+      console.log(`✨ Nuevas fotos agregadas: ${lastPhotoCountRef.current} → ${photos.length}`);
+      console.log('🔄 El slideshow continuará desde la posición actual sin reiniciar');
+      lastPhotoCountRef.current = photos.length;
+    }
+  }, [photos.length, initialized]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -39,7 +68,7 @@ export function TVMode() {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <h1 className="font-display text-6xl font-bold text-gold-500">
+          <h1 className="font-display text-6xl font-bold text-aqua-400">
             PartySnap
           </h1>
           <p className="mt-4 text-2xl text-white/80">
@@ -78,7 +107,7 @@ export function TVMode() {
         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8 pb-12"
       >
         <div className="container mx-auto text-center">
-          <h2 className="font-display text-4xl font-bold text-gold-500">
+          <h2 className="font-display text-4xl font-bold text-aqua-400">
             {currentPhoto.guest_name}
           </h2>
           <p className="mt-2 text-lg text-white/80">

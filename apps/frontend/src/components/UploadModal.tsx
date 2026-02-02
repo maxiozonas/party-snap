@@ -117,7 +117,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
               </button>
 
               <div className="p-6">
-                <h2 className="font-display text-2xl font-bold text-gold-500">
+                <h2 className="font-display text-2xl font-bold text-aqua-600">
                   Subir Foto
                 </h2>
 
@@ -134,12 +134,12 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                     <label
                       htmlFor="photo-input"
                       className={cn(
-                        "flex aspect-square w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gold-300 bg-cream transition-colors hover:border-gold-500 hover:bg-gold-50",
+                        "flex aspect-square w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-aqua-300 bg-sky-50 transition-colors hover:border-aqua-500 hover:bg-aqua-50",
                         isUploading && "pointer-events-none opacity-50"
                       )}
                     >
                       <div className="text-center">
-                        <p className="font-display text-lg text-gold-500">
+                        <p className="font-display text-lg text-aqua-600">
                           Toca para seleccionar una foto
                         </p>
                         <p className="mt-2 text-sm text-gray-600">
@@ -150,7 +150,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                   </div>
                 ) : (
                   <div className="mt-6">
-                    <div className="relative aspect-square overflow-hidden rounded-xl bg-cream">
+                    <div className="relative aspect-square overflow-hidden rounded-xl bg-sky-50">
                       <img
                         src={preview}
                         alt="Preview"
@@ -174,7 +174,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                         placeholder="Ej: María González"
                         maxLength={20}
                         disabled={isUploading}
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500 disabled:opacity-50"
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-aqua-500 focus:outline-none focus:ring-2 focus:ring-aqua-500 disabled:opacity-50"
                       />
                     </div>
 
@@ -182,7 +182,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                       <div className="mt-4">
                         <div className="h-2 overflow-hidden rounded-full bg-gray-200">
                           <motion.div
-                            className="h-full bg-gold-500"
+                            className="h-full bg-aqua-500"
                             initial={{ width: 0 }}
                             animate={{ width: `${uploadProgress}%` }}
                             transition={{ duration: 0.5 }}
@@ -198,7 +198,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                       <button
                         onClick={handleUpload}
                         disabled={isUploading}
-                        className="flex-1 rounded-lg bg-gold-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-600 disabled:pointer-events-none disabled:opacity-50"
+                        className="flex-1 rounded-lg bg-aqua-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-aqua-600 disabled:pointer-events-none disabled:opacity-50"
                       >
                         {isUploading ? 'Subiendo...' : 'Subir Foto'}
                       </button>

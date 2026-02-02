@@ -5,10 +5,10 @@ import type { Photo } from '@/types';
 
 interface PhotoGridProps {
   readonly photos: readonly Photo[];
-  onDelete?: (id: string) => void;
+  onImageError?: (id: string) => void;
 }
 
-export const PhotoGrid = memo(function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
+export const PhotoGrid = memo(function PhotoGrid({ photos, onImageError }: PhotoGridProps) {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -23,7 +23,7 @@ export const PhotoGrid = memo(function PhotoGrid({ photos, onDelete }: PhotoGrid
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <p className="font-display text-2xl text-gold-500">
+          <p className="font-display text-2xl text-aqua-500">
             No hay fotos todavía
           </p>
           <p className="mt-2 text-sm text-gray-600">
@@ -45,7 +45,7 @@ export const PhotoGrid = memo(function PhotoGrid({ photos, onDelete }: PhotoGrid
         <PhotoCard
           key={photo.id}
           photo={photo}
-          onDelete={onDelete}
+          onImageError={onImageError}
         />
       ))}
     </motion.div>

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { Photo, PartySettings } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -20,4 +21,8 @@ export const photosApi = {
   delete: (id: string) => api.delete(`/admin/photo/${id}`),
 };
 
-import type { Photo } from '../types';
+export const settingsApi = {
+  get: () => api.get<{ data: PartySettings }>('/settings'),
+  update: (data: Partial<PartySettings>) => 
+    api.put<{ success: boolean; data: PartySettings }>('/settings', data),
+};
