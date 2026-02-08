@@ -4,6 +4,8 @@ import { X, Loader2 } from 'lucide-react';
 import { compressImage } from '@/lib/image-compression';
 import { photosApi } from '@/lib/api';
 import { usePhotos } from '@/hooks/use-photos';
+import { useGuestSession } from '@/hooks/use-guest-session';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { cn } from '@/lib/utils';
 
 interface UploadModalProps {
@@ -13,11 +15,11 @@ interface UploadModalProps {
 
 export function UploadModal({ isOpen, onClose }: UploadModalProps) {
   const [preview, setPreview] = useState<string | null>(null);
-  const [guestName, setGuestName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate } = usePhotos();
+  const { isValid, guestName } = useGuestSession();
 
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,12 +34,18 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
       reader.readAsDataURL(compressed);
     } catch (error) {
       console.error('Error processing image:', error);
-      alert('Error al procesar la imagen. Intenta con otra.');
+      toastError('Error al procesar la imagen. Intenta con otra.');
     }
   }, []);
 
   const handleUpload = async () => {
     if (!preview) return;
+
+    if (!isValid) {
+      toastError('Para subir fotos, necesitas escanear el QR en el evento 🎉');
+      handleClose();
+      return;
+    }
 
     setIsUploading(true);
     setUploadProgress(0);
@@ -45,21 +53,26 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
     try {
       const formData = new FormData();
       formData.append('photo', dataURLtoFile(preview, 'photo.jpg'));
-      if (guestName.trim()) {
-        formData.append('guest_name', guestName.trim());
-      }
 
       await photosApi.upload(formData);
       
       setUploadProgress(100);
       mutate();
       
+      toastSuccess('Foto subida exitosamente');
+      
       setTimeout(() => {
         handleClose();
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload failed:', error);
-      alert('Error al subir la foto. Intenta de nuevo.');
+      
+      if (error.response?.status === 403) {
+        toastError(error.response.data.message || 'No puedes subir fotos sin escanear el QR');
+      } else {
+        toastError('Error al subir la foto. Intenta de nuevo.');
+      }
+      
       setIsUploading(false);
       setUploadProgress(0);
     }
@@ -67,7 +80,6 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
 
   const handleClose = () => {
     setPreview(null);
-    setGuestName('');
     setUploadProgress(0);
     setIsUploading(false);
     if (fileInputRef.current) {
@@ -121,6 +133,12 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                   Subir Foto
                 </h2>
 
+                {guestName && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    Subiendo como: <span className="font-semibold text-aqua-600">{guestName}</span>
+                  </p>
+                )}
+
                 {!preview ? (
                   <div className="mt-6">
                     <input
@@ -161,21 +179,6 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                           <Loader2 className="h-12 w-12 animate-spin text-white" />
                         </div>
                       )}
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Tu nombre (opcional)
-                      </label>
-                      <input
-                        type="text"
-                        value={guestName}
-                        onChange={(e) => setGuestName(e.target.value)}
-                        placeholder="Ej: María González"
-                        maxLength={20}
-                        disabled={isUploading}
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-aqua-500 focus:outline-none focus:ring-2 focus:ring-aqua-500 disabled:opacity-50"
-                      />
                     </div>
 
                     {isUploading && (

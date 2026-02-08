@@ -12,7 +12,7 @@ class CloudinaryService
         private Cloudinary $cloudinary
     ) {}
 
-    public function upload(UploadedFile $file, string $guestName = null): Photo
+    public function upload(UploadedFile $file, string $guestName, $guestSessionId = null): Photo
     {
         $uploadedFile = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
             'folder' => 'joseta',
@@ -25,10 +25,11 @@ class CloudinaryService
         return Photo::create([
             'cloudinary_public_id' => $uploadedFile['public_id'],
             'secure_url' => $uploadedFile['secure_url'],
-            'guest_name' => $guestName ?? 'Anónimo',
+            'guest_name' => $guestName,
             'mime_type' => $file->getMimeType(),
             'size_kb' => round($file->getSize() / 1024),
             'client_ip' => request()->ip(),
+            'guest_session_id' => $guestSessionId,
         ]);
     }
 

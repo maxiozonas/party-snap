@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Photo extends Model
 {
@@ -15,6 +16,7 @@ class Photo extends Model
         'size_kb',
         'is_approved',
         'client_ip',
+        'guest_session_id',
     ];
 
     protected $casts = [
@@ -32,5 +34,15 @@ class Photo extends Model
     public function scopeRecent(Builder $query): Builder
     {
         return $query->orderBy('created_at', 'desc');
+    }
+
+    public function scopeWithSession(Builder $query): Builder
+    {
+        return $query->whereNotNull('guest_session_id');
+    }
+
+    public function guestSession(): BelongsTo
+    {
+        return $this->belongsTo(GuestSession::class, 'guest_session_id');
     }
 }
