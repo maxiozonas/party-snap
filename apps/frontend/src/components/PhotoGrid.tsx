@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
+import { Camera } from 'lucide-react';
 import { PhotoCard } from './PhotoCard';
 import type { Photo } from '@/types';
 
@@ -14,20 +15,23 @@ export const PhotoGrid = memo(function PhotoGrid({ photos, onImageError }: Photo
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.06
       }
     }
   };
 
   if (photos.length === 0) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="flex min-h-[50vh] items-center justify-center">
         <div className="text-center">
-          <p className="font-display text-2xl text-aqua-500">
-            No hay fotos todavía
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
+            <Camera className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <p className="font-display text-lg font-semibold text-foreground">
+            No hay fotos todavia
           </p>
-          <p className="mt-2 text-sm text-gray-600">
-            ¡Sé el primero en subir una foto!
+          <p className="mt-1 text-sm text-muted-foreground">
+            Se el primero en subir una foto
           </p>
         </div>
       </div>
@@ -39,7 +43,7 @@ export const PhotoGrid = memo(function PhotoGrid({ photos, onImageError }: Photo
       variants={container}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+      className="columns-2 gap-3 sm:columns-3 md:columns-4 lg:columns-5"
     >
       {photos.map((photo) => (
         <PhotoCard

@@ -4,22 +4,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 4%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 96%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
+    --border: 0 0% 18%;
+    --ring: 43 96% 56%;
+    --accent: 43 96% 56%;
+    --accent-foreground: 0 0% 4%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 
   h1, h2, h3 {
-    @apply text-aqua-600;
+    @apply text-foreground;
   }
 }
 
 @layer components {
   .shimmer-effect {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
     background-size: 1000px 100%;
   }
 }

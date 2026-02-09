@@ -1,4 +1,4 @@
-import { Images, Clock } from 'lucide-react';
+import { Images, CheckSquare } from 'lucide-react';
 
 interface AdminStatsProps {
   readonly totalPhotos: number;
@@ -7,23 +7,25 @@ interface AdminStatsProps {
 
 export function AdminStats({ totalPhotos, selectedCount }: AdminStatsProps) {
   return (
-    <div className="mb-6 grid grid-cols-2 gap-3">
-      <div className="rounded-lg bg-white p-4 shadow-md border-2 border-aqua-200">
+    <div className="grid grid-cols-2 gap-3">
+      <div className="rounded-2xl bg-card border border-border p-4">
         <div className="flex items-center gap-2">
-          <Images className="h-5 w-5 text-aqua-600" />
-          <p className="text-xs font-semibold text-gray-600 uppercase">Total</p>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-400/10">
+            <Images className="h-4 w-4 text-accent-400" />
+          </div>
         </div>
-        <p className="mt-2 text-3xl font-bold text-aqua-600">{totalPhotos}</p>
-        <p className="text-xs text-gray-500">fotos subidas</p>
+        <p className="mt-3 text-3xl font-bold text-foreground">{totalPhotos}</p>
+        <p className="text-xs text-muted-foreground">fotos subidas</p>
       </div>
 
-      <div className="rounded-lg bg-white p-4 shadow-md border-2 border-sky-200">
+      <div className="rounded-2xl bg-card border border-border p-4">
         <div className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-sky-600" />
-          <p className="text-xs font-semibold text-gray-600 uppercase">Seleccionadas</p>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-400/10">
+            <CheckSquare className="h-4 w-4 text-accent-400" />
+          </div>
         </div>
-        <p className="mt-2 text-3xl font-bold text-sky-600">{selectedCount}</p>
-        <p className="text-xs text-gray-500">para eliminar</p>
+        <p className="mt-3 text-3xl font-bold text-foreground">{selectedCount}</p>
+        <p className="text-xs text-muted-foreground">seleccionadas</p>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { Camera } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface UploadButtonProps {
@@ -9,23 +8,15 @@ interface UploadButtonProps {
 
 export function UploadButton({ onClick, disabled }: UploadButtonProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex justify-center py-8"
+    <Button
+      onClick={onClick}
+      disabled={disabled}
+      size="default"
+      className="rounded-xl px-4 py-2 text-sm font-semibold"
     >
-      <Button
-        onClick={onClick}
-        disabled={disabled}
-        size="lg"
-        className="relative overflow-hidden rounded-full px-12 py-8 text-xl font-semibold shadow-xl"
-      >
-        <div className="shimmer-effect absolute inset-0 animate-shimmer" />
-        <span className="relative flex items-center gap-3">
-          <Camera size={28} />
-          Subir Foto
-        </span>
-      </Button>
-    </motion.div>
+      <Plus size={18} />
+      <span className="hidden sm:inline">Subir Foto</span>
+      <span className="sm:hidden">Subir</span>
+    </Button>
   );
 }

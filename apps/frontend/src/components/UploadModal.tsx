@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, ImagePlus, Upload } from 'lucide-react';
 import { compressImage } from '@/lib/image-compression';
 import { photosApi } from '@/lib/api';
 import { usePhotos } from '@/hooks/use-photos';
@@ -97,32 +97,40 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
           />
           
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="relative w-full max-w-md overflow-hidden rounded-t-3xl bg-card border border-border sm:rounded-2xl"
             >
+              {/* Drag handle for mobile */}
+              <div className="flex justify-center pt-3 sm:hidden">
+                <div className="h-1 w-10 rounded-full bg-neutral-600" />
+              </div>
+
               <button
                 onClick={handleClose}
-                className="absolute right-4 top-4 rounded-full bg-black/10 p-2 transition-colors hover:bg-black/20"
+                className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors hover:bg-neutral-700 hover:text-foreground"
                 disabled={isUploading}
               >
-                <X size={20} />
+                <X size={16} />
               </button>
 
               <div className="p-6">
-                <h2 className="font-display text-2xl font-bold text-aqua-600">
+                <h2 className="font-display text-xl font-bold text-foreground">
                   Subir Foto
                 </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Comparte tu mejor momento
+                </p>
 
                 {!preview ? (
-                  <div className="mt-6">
+                  <div className="mt-5">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -134,78 +142,80 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                     <label
                       htmlFor="photo-input"
                       className={cn(
-                        "flex aspect-square w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-aqua-300 bg-sky-50 transition-colors hover:border-aqua-500 hover:bg-aqua-50",
+                        "flex aspect-[4/3] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-600 bg-muted/50 transition-all hover:border-accent-400 hover:bg-muted",
                         isUploading && "pointer-events-none opacity-50"
                       )}
                     >
                       <div className="text-center">
-                        <p className="font-display text-lg text-aqua-600">
-                          Toca para seleccionar una foto
+                        <ImagePlus className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+                        <p className="text-sm font-medium text-foreground">
+                          Toca para seleccionar
                         </p>
-                        <p className="mt-2 text-sm text-gray-600">
-                          Máximo 8MB
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          JPG, PNG - Max 8MB
                         </p>
                       </div>
                     </label>
                   </div>
                 ) : (
-                  <div className="mt-6">
-                    <div className="relative aspect-square overflow-hidden rounded-xl bg-sky-50">
+                  <div className="mt-5">
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
                       <img
                         src={preview}
                         alt="Preview"
                         className="h-full w-full object-cover"
                       />
                       {isUploading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                          <Loader2 className="h-12 w-12 animate-spin text-white" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                          <Loader2 className="h-10 w-10 animate-spin text-accent-400" />
                         </div>
                       )}
                     </div>
 
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-muted-foreground">
                         Tu nombre (opcional)
                       </label>
                       <input
                         type="text"
                         value={guestName}
                         onChange={(e) => setGuestName(e.target.value)}
-                        placeholder="Ej: María González"
+                        placeholder="Ej: Maria Gonzalez"
                         maxLength={20}
                         disabled={isUploading}
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-aqua-500 focus:outline-none focus:ring-2 focus:ring-aqua-500 disabled:opacity-50"
+                        className="mt-1.5 w-full rounded-xl border border-border bg-muted px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400 disabled:opacity-50"
                       />
                     </div>
 
                     {isUploading && (
                       <div className="mt-4">
-                        <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+                        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                           <motion.div
-                            className="h-full bg-aqua-500"
+                            className="h-full bg-accent-400"
                             initial={{ width: 0 }}
                             animate={{ width: `${uploadProgress}%` }}
                             transition={{ duration: 0.5 }}
                           />
                         </div>
-                        <p className="mt-2 text-center text-sm text-gray-600">
+                        <p className="mt-2 text-center text-xs text-muted-foreground">
                           Subiendo... {Math.round(uploadProgress)}%
                         </p>
                       </div>
                     )}
 
-                    <div className="mt-6 flex gap-3">
+                    <div className="mt-5 flex gap-3">
                       <button
                         onClick={handleUpload}
                         disabled={isUploading}
-                        className="flex-1 rounded-lg bg-aqua-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-aqua-600 disabled:pointer-events-none disabled:opacity-50"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent-400 px-6 py-3 text-sm font-semibold text-neutral-950 transition-all hover:bg-accent-300 active:bg-accent-500 disabled:pointer-events-none disabled:opacity-50"
                       >
+                        <Upload size={16} />
                         {isUploading ? 'Subiendo...' : 'Subir Foto'}
                       </button>
                       <button
                         onClick={handleClose}
                         disabled={isUploading}
-                        className="rounded-lg border border-gray-300 px-6 py-3 font-semibold text-gray-700 transition-colors hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-50"
+                        className="rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
                       >
                         Cancelar
                       </button>

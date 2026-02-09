@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Camera } from 'lucide-react';
 import { usePhotos } from '@/hooks/use-photos';
 import { usePhotoStream } from '@/hooks/use-photo-stream';
 
@@ -11,7 +12,6 @@ export function TVMode() {
 
   usePhotoStream({
     onNewPhotos: () => {
-      console.log('📸 Nuevas fotos detectadas - Actualizando slideshow...');
       mutate();
     },
   });
@@ -27,11 +27,7 @@ export function TVMode() {
     if (photos.length === 0 || !initialized) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => {
-        const nextIndex = (prev + 1) % photos.length;
-        console.log(`🖼️ Mostrando foto ${nextIndex + 1}/${photos.length}`);
-        return nextIndex;
-      });
+      setCurrentIndex((prev) => (prev + 1) % photos.length);
     }, 5000);
 
     return () => clearInterval(interval);
@@ -39,8 +35,6 @@ export function TVMode() {
 
   useEffect(() => {
     if (photos.length > lastPhotoCountRef.current && initialized) {
-      console.log(`✨ Nuevas fotos agregadas: ${lastPhotoCountRef.current} → ${photos.length}`);
-      console.log('🔄 El slideshow continuará desde la posición actual sin reiniciar');
       lastPhotoCountRef.current = photos.length;
     }
   }, [photos.length, initialized]);
@@ -61,19 +55,25 @@ export function TVMode() {
 
   if (photos.length === 0) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black">
+      <div className="flex h-screen items-center justify-center bg-neutral-950">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <h1 className="font-display text-6xl font-bold text-aqua-400">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-accent-400">
+            <Camera className="h-10 w-10 text-neutral-950" />
+          </div>
+          <h1 className="font-display text-5xl font-bold text-foreground tracking-tight">
             PartySnap
           </h1>
-          <p className="mt-4 text-2xl text-white/80">
+          <p className="mt-3 text-xl text-muted-foreground">
             Esperando fotos...
           </p>
+          <div className="mt-8 flex justify-center">
+            <div className="h-1 w-16 animate-pulse-slow rounded-full bg-accent-400/40" />
+          </div>
         </motion.div>
       </div>
     );
@@ -82,14 +82,14 @@ export function TVMode() {
   const currentPhoto = photos[currentIndex];
 
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-black">
+    <div className="fixed inset-0 h-screen w-screen bg-neutral-950">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, scale: 1.1 }}
+          initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 1, ease: 'easeInOut' }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
           className="absolute inset-0 flex items-center justify-center"
         >
           <img
@@ -100,31 +100,49 @@ export function TVMode() {
         </motion.div>
       </AnimatePresence>
 
+      {/* Bottom info bar */}
       <motion.div
-        initial={{ y: 100, opacity: 0 }}
+        initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8 pb-12"
+        transition={{ delay: 0.3, duration: 0.6 }}
+        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
       >
-        <div className="container mx-auto text-center">
-          <h2 className="font-display text-4xl font-bold text-aqua-400">
-            {currentPhoto.guest_name}
-          </h2>
-          <p className="mt-2 text-lg text-white/80">
-            {new Date(currentPhoto.created_at).toLocaleTimeString('es-ES', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </p>
+        <div className="flex items-end justify-between px-10 pb-10 pt-20">
+          <div>
+            <p className="font-display text-3xl font-bold text-white tracking-tight">
+              {currentPhoto.guest_name}
+            </p>
+            <p className="mt-1 text-base text-white/50">
+              {new Date(currentPhoto.created_at).toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-sm px-4 py-2">
+              <Camera className="h-4 w-4 text-accent-400" />
+              <span className="text-sm font-medium text-white/80">
+                {currentIndex + 1} / {photos.length}
+              </span>
+            </div>
+          </div>
         </div>
       </motion.div>
 
-      <div className="absolute top-8 right-8 text-white/50 text-sm">
-        {currentIndex + 1} / {photos.length}
+      {/* Progress bar */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10">
+        <motion.div
+          key={currentIndex}
+          initial={{ width: '0%' }}
+          animate={{ width: '100%' }}
+          transition={{ duration: 5, ease: 'linear' }}
+          className="h-full bg-accent-400"
+        />
       </div>
 
-      <div className="absolute bottom-8 left-8 text-white/50 text-sm">
-        Presiona <kbd className="px-2 py-1 bg-white/10 rounded">F</kbd> para pantalla completa
+      <div className="absolute bottom-4 left-10 text-white/30 text-xs">
+        Presiona <kbd className="px-1.5 py-0.5 bg-white/10 rounded-md text-white/50 font-mono">F</kbd> para pantalla completa
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Trash2, AlertTriangle } from 'lucide-react';
+import { Shield, Trash2, Camera, ArrowLeft } from 'lucide-react';
 import { PhotoCardAdmin } from '@/components/PhotoCardAdmin';
 import { AdminStats } from '@/components/AdminStats';
 import { SettingsEditor } from '@/components/SettingsEditor';
@@ -91,35 +91,38 @@ export function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-aqua-50">
-      <header className="border-b-4 border-aqua-600 bg-white/90 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto max-w-6xl px-4 py-4">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-aqua-600" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+                <Shield className="h-5 w-5 text-accent-400" />
+              </div>
               <div>
-                <h1 className="font-display text-2xl font-bold text-aqua-600">
+                <h1 className="font-display text-lg font-bold tracking-tight text-foreground">
                   Panel de Admin
                 </h1>
-                <p className="text-xs text-sky-700">Gestiona las fotos de la fiesta</p>
+                <p className="text-xs text-muted-foreground">Gestiona las fotos de la fiesta</p>
               </div>
             </div>
 
             <a
               href={window.location.pathname.startsWith('/party-snap') ? '/party-snap/' : '/'}
-              className="rounded-lg bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-200 transition-colors"
+              className="flex items-center gap-2 rounded-xl bg-muted px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-neutral-700"
             >
-              ← Volver
+              <ArrowLeft size={16} />
+              Volver
             </a>
           </motion.div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 space-y-6">
+      <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <SettingsEditor />
         
         <AdminStats totalPhotos={photos.length} selectedCount={selectedPhotos.size} />
@@ -128,16 +131,16 @@ export function Admin() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-lg bg-aqua-50 border-2 border-aqua-500 p-4"
+            className="rounded-2xl bg-accent-400/10 border border-accent-400/20 p-4"
           >
             <div className="flex items-center justify-between gap-4">
-              <p className="text-sm font-semibold text-aqua-700">
+              <p className="text-sm font-medium text-accent-400">
                 {selectedPhotos.size} foto(s) seleccionada(s)
               </p>
               <Button
                 onClick={handleDeleteSelected}
                 disabled={isDeleting}
-                className="bg-red-500 hover:bg-red-600 text-white"
+                variant="destructive"
               >
                 <Trash2 size={16} />
                 {isDeleting ? 'Eliminando...' : 'Eliminar seleccionadas'}
@@ -147,29 +150,31 @@ export function Admin() {
         )}
 
         {photos.length === 0 && !isLoading ? (
-          <div className="flex min-h-[400px] items-center justify-center">
+          <div className="flex min-h-[50vh] items-center justify-center">
             <div className="text-center">
-              <AlertTriangle className="mx-auto mb-4 h-16 w-16 text-aqua-400" />
-              <p className="font-display text-xl text-aqua-600">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
+                <Camera className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <p className="font-display text-lg font-semibold text-foreground">
                 No hay fotos para gestionar
               </p>
-              <p className="mt-2 text-sm text-sky-700">
-                Las fotos aparecerán aquí cuando los invitados las suban.
+              <p className="mt-1 text-sm text-muted-foreground">
+                Las fotos apareceran aqui cuando los invitados las suban.
               </p>
             </div>
           </div>
         ) : (
           <>
-            <div className="mb-4 flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4">
               <button
                 onClick={handleSelectAll}
-                className="text-sm font-semibold text-sky-700 hover:text-aqua-600 transition-colors"
+                className="text-sm font-medium text-accent-400 hover:text-accent-300 transition-colors"
               >
                 {selectedPhotos.size === photos.length
                   ? 'Deseleccionar todas'
                   : 'Seleccionar todas'}
               </button>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {photos.length} foto(s) total
               </p>
             </div>
@@ -195,11 +200,11 @@ export function Admin() {
           <DialogHeader>
             <DialogTitle>
               {deleteMode === 'multiple'
-                ? `¿Eliminar ${selectedPhotos.size} foto(s)?`
-                : '¿Eliminar esta foto?'}
+                ? `Eliminar ${selectedPhotos.size} foto(s)?`
+                : 'Eliminar esta foto?'}
             </DialogTitle>
             <DialogDescription>
-              Esta acción no se puede deshacer. Las fotos serán eliminadas permanentemente de la base de datos y de Cloudinary.
+              Esta accion no se puede deshacer. Las fotos seran eliminadas permanentemente de la base de datos y de Cloudinary.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -213,7 +218,7 @@ export function Admin() {
             <Button
               onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              variant="destructive"
             >
               {isDeleting ? 'Eliminando...' : 'Eliminar'}
             </Button>
