@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PhotoResource;
 use App\Models\Photo;
-use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PhotoStreamController extends Controller
@@ -68,6 +66,6 @@ class PhotoStreamController extends Controller
 
     private function sendSSE(array $data): void
     {
-        echo "data: " . json_encode($data) . "\n\n";
+        echo 'data: '.json_encode($data)."\n\n";
     }
 }

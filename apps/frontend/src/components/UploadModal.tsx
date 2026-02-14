@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Edit2, Check, XCircle } from 'lucide-react';
 import { compressImage } from '@/lib/image-compression';
 import { photosApi } from '@/lib/api';
 import { usePhotos } from '@/hooks/use-photos';
@@ -17,9 +17,12 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate } = usePhotos();
-  const { isValid, guestName } = useGuestSession();
+  const { isValid, guestName, updateGuestName } = useGuestSession();
 
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -100,6 +103,34 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
     return new File([u8arr], filename, { type: mime });
   };
 
+  const handleStartEditing = () => {
+    setNewName(guestName || '');
+    setIsEditingName(true);
+  };
+
+  const handleCancelEditing = () => {
+    setIsEditingName(false);
+    setNewName('');
+  };
+
+  const handleSaveName = async () => {
+    if (newName.trim().length < 2) {
+      toastError('El nombre debe tener al menos 2 caracteres');
+      return;
+    }
+
+    setIsUpdatingName(true);
+    const result = await updateGuestName(newName.trim());
+    setIsUpdatingName(false);
+
+    if (result.success) {
+      toastSuccess('Nombre actualizado exitosamente');
+      setIsEditingName(false);
+    } else {
+      toastError(result.message || 'Error al actualizar nombre');
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -133,10 +164,60 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                   Subir Foto
                 </h2>
 
-                {guestName && (
-                  <p className="mt-1 text-sm text-gray-500">
-                    Subiendo como: <span className="font-semibold text-aqua-600">{guestName}</span>
-                  </p>
+                {guestName && !isEditingName && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <p className="text-sm text-gray-500">
+                      Subiendo como: <span className="font-semibold text-aqua-600">{guestName}</span>
+                    </p>
+                    <button
+                      onClick={handleStartEditing}
+                      className="text-aqua-500 hover:text-aqua-700 transition-colors"
+                      title="Cambiar nombre"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                  </div>
+                )}
+
+                {isEditingName && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      placeholder="Tu nombre"
+                      className="flex-1 rounded-lg border border-gray-300 px-3 py-1 text-sm focus:border-aqua-500 focus:outline-none focus:ring-1 focus:ring-aqua-500"
+                      maxLength={100}
+                      disabled={isUpdatingName}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveName();
+                        } else if (e.key === 'Escape') {
+                          handleCancelEditing();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={handleSaveName}
+                      disabled={isUpdatingName || newName.trim().length < 2}
+                      className="rounded-lg bg-aqua-500 p-1.5 text-white hover:bg-aqua-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Guardar"
+                    >
+                      {isUpdatingName ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Check size={16} />
+                      )}
+                    </button>
+                    <button
+                      onClick={handleCancelEditing}
+                      disabled={isUpdatingName}
+                      className="rounded-lg bg-gray-200 p-1.5 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
+                      title="Cancelar"
+                    >
+                      <XCircle size={16} />
+                    </button>
+                  </div>
                 )}
 
                 {!preview ? (

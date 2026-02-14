@@ -4,13 +4,16 @@ import { Sparkles } from 'lucide-react';
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { UploadButton } from '@/components/UploadButton';
 import { UploadModal } from '@/components/UploadModal';
+import { ScanQRNotice } from '@/components/ScanQRNotice';
 import { usePhotos } from '@/hooks/use-photos';
 import { useSettings } from '@/hooks/use-settings';
+import { useGuestSession } from '@/hooks/use-guest-session';
 
 export function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { photos, isLoading, error, mutate } = usePhotos();
   const { settings } = useSettings();
+  const { isValid: hasGuestSession } = useGuestSession();
 
   const handleImageError = (photoId: string) => {
     console.log(`Foto con ID ${photoId} no se pudo cargar - eliminando del estado local`);
@@ -41,7 +44,12 @@ export function Home() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <UploadButton onClick={() => setIsUploadModalOpen(true)} />
+        {!hasGuestSession && <ScanQRNotice />}
+        {hasGuestSession && (
+          <UploadButton 
+            onClick={() => setIsUploadModalOpen(true)} 
+          />
+        )}
 
         {error && (
           <motion.div
@@ -74,7 +82,7 @@ export function Home() {
       </main>
 
       <UploadModal
-        isOpen={isUploadModalOpen}
+        isOpen={isUploadModalOpen && hasGuestSession}
         onClose={() => setIsUploadModalOpen(false)}
       />
     </div>

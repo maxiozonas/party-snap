@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UploadPhotoRequest;
 use App\Http\Resources\PhotoResource;
-use App\Models\Photo;
 use App\Models\GuestSession;
+use App\Models\Photo;
 use App\Services\CloudinaryService;
 use Illuminate\Http\JsonResponse;
 
@@ -28,7 +28,7 @@ class PhotoController extends Controller
     {
         $token = $request->header('X-Guest-Token');
 
-        if (!$token) {
+        if (! $token) {
             return response()->json([
                 'message' => 'Para compartir tus fotos, necesitas escanear el QR en el evento 🎉',
                 'code' => 'MISSING_GUEST_TOKEN',
@@ -37,14 +37,14 @@ class PhotoController extends Controller
 
         $session = GuestSession::validToken($token)->first();
 
-        if (!$session) {
+        if (! $session) {
             return response()->json([
                 'message' => 'Tu sesión expiró. Por favor, escanea el QR nuevamente.',
                 'code' => 'INVALID_GUEST_TOKEN',
             ], 403);
         }
 
-        if (!$session->guest_name) {
+        if (! $session->guest_name) {
             return response()->json([
                 'message' => 'Debe ingresar un nombre para subir fotos.',
                 'code' => 'MISSING_GUEST_NAME',

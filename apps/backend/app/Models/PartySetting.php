@@ -39,6 +39,7 @@ class PartySetting extends Model
     {
         $settings = static::getCurrent();
         $settings->update($data);
+
         return $settings->fresh();
     }
 }

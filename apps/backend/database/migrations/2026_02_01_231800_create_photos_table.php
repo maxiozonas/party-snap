@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_approved')->default(true);
             $table->string('client_ip')->nullable();
             $table->timestamps();
-            
+
             $table->index('created_at');
             $table->index('is_approved');
         });

@@ -24,22 +24,24 @@ export function GuestNameModal({ token, onSuccess }: GuestNameModalProps) {
     setError('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/sessions`, {
+      // Use the new registration endpoint to create individual session
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/sessions/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          token,
-          guest_name: guestName.trim(),
+          master_token: token,        // Token from QR (master token)
+          guest_name: guestName.trim(), // User's individual name
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok && data.valid) {
-        localStorage.setItem('guest_token', token);
+      if (response.ok && data.valid && data.session_token) {
+        // Save the INDIVIDUAL session token (not the master QR token)
+        localStorage.setItem('guest_token', data.session_token);
         localStorage.setItem('guest_name', data.guest_name);
         onSuccess();
       } else {

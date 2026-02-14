@@ -4,10 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class GuestSession extends Model
+class PartyToken extends Model
 {
     protected $keyType = 'string';
 
@@ -15,36 +14,20 @@ class GuestSession extends Model
 
     protected $fillable = [
         'id',
-        'party_token_id',
         'token',
-        'guest_name',
-        'client_ip',
-        'user_agent',
-        'first_seen_at',
-        'last_seen_at',
-        'photos_count',
-        'is_active',
+        'event_name',
         'expires_at',
+        'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'photos_count' => 'integer',
-        'first_seen_at' => 'datetime',
-        'last_seen_at' => 'datetime',
         'expires_at' => 'datetime',
     ];
 
-    public $timestamps = false;
-
-    public function photos(): HasMany
+    public function guestSessions(): HasMany
     {
-        return $this->hasMany(Photo::class, 'guest_session_id');
-    }
-
-    public function partyToken(): BelongsTo
-    {
-        return $this->belongsTo(PartyToken::class);
+        return $this->hasMany(GuestSession::class);
     }
 
     public function scopeActive(Builder $query): Builder
@@ -62,8 +45,16 @@ class GuestSession extends Model
             });
     }
 
-    public function incrementPhotosCount(): void
+    public function isValid(): bool
     {
-        $this->increment('photos_count');
+        if (! $this->is_active) {
+            return false;
+        }
+
+        if ($this->expires_at && $this->expires_at->isPast()) {
+            return false;
+        }
+
+        return true;
     }
 }

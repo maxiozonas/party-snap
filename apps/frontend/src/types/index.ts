@@ -25,9 +25,10 @@ export interface GuestSession {
 
 export interface CreateGuestSessionResponse {
   valid: boolean;
-  exists: boolean;
+  exists?: boolean;
   guest_name: string;
-  session_id: string;
+  session_id?: string;
+  session_token?: string; // Individual session token for new registration
 }
 
 export interface ValidateGuestSessionResponse {

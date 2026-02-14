@@ -15,7 +15,7 @@ class WebhookController extends Controller
 
         Log::info('Cloudinary webhook received', ['payload' => $payload]);
 
-        if (!isset($payload['notification_type'])) {
+        if (! isset($payload['notification_type'])) {
             return response()->json(['error' => 'Invalid webhook'], 400);
         }
 
@@ -40,8 +40,9 @@ class WebhookController extends Controller
     {
         $publicId = $payload['resources'][0]['public_id'] ?? null;
 
-        if (!$publicId) {
+        if (! $publicId) {
             Log::warning('Webhook delete missing public_id', ['payload' => $payload]);
+
             return response()->json(['error' => 'Missing public_id'], 400);
         }
 
@@ -61,8 +62,9 @@ class WebhookController extends Controller
     {
         $resource = $payload['resources'][0] ?? null;
 
-        if (!$resource) {
+        if (! $resource) {
             Log::warning('Webhook upsert missing resource', ['payload' => $payload]);
+
             return response()->json(['error' => 'Missing resource'], 400);
         }
 
@@ -71,7 +73,7 @@ class WebhookController extends Controller
 
         $photo = Photo::where('cloudinary_public_id', $publicId)->first();
 
-        if (!$photo) {
+        if (! $photo) {
             Photo::create([
                 'cloudinary_public_id' => $publicId,
                 'secure_url' => $secureUrl,

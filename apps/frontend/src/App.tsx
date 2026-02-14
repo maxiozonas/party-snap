@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Home } from './views/Home';
 import { TVMode } from './views/TVMode';
 import { Admin } from './views/Admin';
+import { AdminLogin } from './views/AdminLogin';
 import { GuestNameModal } from './components/GuestNameModal';
 import { useGuestSession } from './hooks/use-guest-session';
+import { useAdminAuth } from './hooks/use-admin-auth';
 
 function App() {
   const [pathname, setPathname] = useState(window.location.pathname);
@@ -11,6 +13,7 @@ function App() {
     new URLSearchParams(window.location.search)
   );
   const { isValid, isLoading: sessionLoading, guestName } = useGuestSession();
+  const { isAuthenticated, isLoading: adminLoading, logout } = useAdminAuth();
   const [showNameModal, setShowNameModal] = useState(false);
   const [tokenFromUrl, setTokenFromUrl] = useState<string | null>(null);
 
@@ -65,7 +68,22 @@ function App() {
   }
 
   if (route === '/admin') {
-    return <Admin />;
+    if (adminLoading) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-sky-50 via-white to-aqua-50">
+          <div className="text-center">
+            <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-aqua-500 border-t-transparent" />
+            <p className="text-lg text-aqua-600">Cargando...</p>
+          </div>
+        </div>
+      );
+    }
+    
+    if (!isAuthenticated) {
+      return <AdminLogin onLogin={() => window.location.reload()} />;
+    }
+    
+    return <Admin onLogout={logout} />;
   }
 
   return <Home />;

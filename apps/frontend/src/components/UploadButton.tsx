@@ -4,10 +4,9 @@ import { Button } from './ui/button';
 
 interface UploadButtonProps {
   onClick: () => void;
-  disabled?: boolean;
 }
 
-export function UploadButton({ onClick, disabled }: UploadButtonProps) {
+export function UploadButton({ onClick }: UploadButtonProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -16,7 +15,6 @@ export function UploadButton({ onClick, disabled }: UploadButtonProps) {
     >
       <Button
         onClick={onClick}
-        disabled={disabled}
         size="lg"
         className="relative overflow-hidden rounded-full px-12 py-8 text-xl font-semibold shadow-xl"
       >

@@ -68,7 +68,7 @@ export function useGuestSession() {
 
   const createSession = async (token: string, guestName: string) => {
     try {
-      const response = await sessionsApi.create({ token, guest_name: guestName });
+      const response = await sessionsApi.create({ master_token: token, guest_name: guestName });
 
       if (response.data.valid) {
         localStorage.setItem('guest_token', token);
@@ -104,10 +104,36 @@ export function useGuestSession() {
     });
   };
 
+  const updateGuestName = async (newName: string) => {
+    const token = localStorage.getItem('guest_token');
+    if (!token) {
+      return { success: false, message: 'No hay sesión activa' };
+    }
+
+    try {
+      const response = await sessionsApi.update(token, newName);
+      if (response.data.valid) {
+        localStorage.setItem('guest_name', newName);
+        setState(prev => ({
+          ...prev,
+          guestName: newName,
+        }));
+        return { success: true };
+      }
+      return { success: false, message: response.data.message };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Error al actualizar nombre' 
+      };
+    }
+  };
+
   return {
     ...state,
     createSession,
     clearSession,
+    updateGuestName,
     refreshSession: validateSession,
   };
 }

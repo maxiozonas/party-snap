@@ -12,10 +12,17 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('guest_token');
-  if (token) {
-    config.headers['X-Guest-Token'] = token;
+  const guestToken = localStorage.getItem('guest_token');
+  const adminToken = localStorage.getItem('admin_token');
+  
+  if (guestToken) {
+    config.headers['X-Guest-Token'] = guestToken;
   }
+  
+  if (adminToken) {
+    config.headers['Authorization'] = `Bearer ${adminToken}`;
+  }
+  
   return config;
 });
 
@@ -36,9 +43,15 @@ export const settingsApi = {
 };
 
 export const sessionsApi = {
-  create: (data: { token: string; guest_name: string }) => 
-    api.post<CreateGuestSessionResponse>('/sessions', data),
+  // Register new guest session from QR scan (creates individual session)
+  create: (data: { master_token: string; guest_name: string }) => 
+    api.post<CreateGuestSessionResponse>('/sessions/register', data),
   
+  // Validate individual session token
   validate: (token: string) => 
     api.get<ValidateGuestSessionResponse>(`/sessions/validate/${token}`),
+  
+  // Update guest name
+  update: (token: string, guestName: string) =>
+    api.put(`/sessions/${token}`, { guest_name: guestName }),
 };
