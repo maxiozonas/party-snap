@@ -10,34 +10,36 @@ pnpm lint         # Lint all apps
 pnpm test         # Test all apps
 ```
 
-### Frontend (apps/frontend)
+### Frontend (React + TypeScript)
 ```bash
-pnpm --filter frontend dev         # Dev server
-pnpm --filter frontend build       # Production build
-pnpm --filter frontend lint        # ESLint
-pnpm --filter frontend lint:fix    # ESLint auto-fix
-pnpm --filter frontend typecheck   # TypeScript check
-pnpm --filter frontend test        # Run all tests
-pnpm --filter frontend test <path> # Run single test file
-pnpm --filter frontend test:watch  # Watch mode
-pnpm --filter frontend test:coverage # Coverage report
+pnpm --filter frontend dev              # Dev server
+pnpm --filter frontend build            # Production build (tsc + vite)
+pnpm --filter frontend lint             # ESLint with @eslint/js, typescript-eslint
+pnpm --filter frontend lint:fix         # ESLint auto-fix
+pnpm --filter frontend typecheck        # TypeScript check (tsc --noEmit)
 ```
 
-### Backend (apps/backend)
+### Backend (Laravel + PHP 8.2)
 ```bash
-php artisan serve                  # Dev server
-php artisan test                   # All tests
-php artisan test --filter <Test>   # Single test class
+# Development
+php artisan serve                       # Dev server
+composer dev                            # Concurrent: serve, queue, logs, vite
+
+# Testing
+php artisan test                        # PHPUnit tests
+php artisan test --filter <Test>        # Single test class
 php artisan test --filter <Test>::<method> # Single test method
-php artisan test --coverage        # Coverage
-./vendor/bin/phpstan analyse       # Static analysis
-./vendor/bin/pint                  # Format code
-./vendor/bin/pint --test           # Check style only
+php artisan test --coverage             # Coverage report
+
+# Code Quality
+./vendor/bin/pint                       # Laravel Pint (format code)
+./vendor/bin/pint --test                # Check style only
+./vendor/bin/phpstan analyse            # Static analysis
 ```
 
 ---
 
-## Frontend Code Style (React + TypeScript)
+## Frontend Code Style (React 19 + TypeScript 5.9)
 
 ### Import Order
 1. React imports
@@ -47,7 +49,6 @@ php artisan test --coverage        # Coverage
 5. TypeScript types
 
 ```typescript
-// ✅ Correct
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -57,15 +58,14 @@ import type { Photo } from '@/types';
 ```
 
 ### Component Guidelines
-- Functional components with hooks only
-- TypeScript for all props (interfaces preferred)
+- Functional components with hooks only (no classes)
 - PascalCase for components, camelCase for functions
+- TypeScript interfaces for props (use `readonly` for immutable props)
 - Extract reusable logic to `use-*.ts` hooks
 - Keep components under 200 lines
-- Use `className` prop for flexibility with `cn()`
+- Use `className` prop with `cn()` utility for styling
 
 ```typescript
-// ✅ Correct
 interface PhotoCardProps {
   readonly photo: Photo;
   onDelete?: (id: string) => void;
@@ -80,29 +80,22 @@ export function PhotoCard({ photo, onDelete, className }: PhotoCardProps) {
 ### TypeScript Rules
 - Use `interface` for object shapes, `type` for unions
 - Avoid `any`; use `unknown` if truly unknown
-- Use `readonly` for immutable props
 - Export types used across modules
 
-### State Management
+### State Management & Error Handling
 - Use SWR for server state (already configured)
 - Keep state local when possible
-- Avoid prop drilling (use composition)
+- Always handle Promise rejections with user-friendly messages
+- Implement retry logic for failed uploads
 
-### Error Handling
-- Always handle Promise rejections
-- Show user-friendly error messages
-- Log errors for debugging
-- Implement retry for failed uploads
-
-### Performance (Vercel Best Practices)
+### Performance
 - Use `React.memo()` for expensive renders
 - Lazy load routes with `React.lazy()`
 - Use `Promise.all()` for independent async operations
-- Hoist static JSX outside components
 
 ---
 
-## Backend Code Style (Laravel + PHP)
+## Backend Code Style (Laravel 12 + PHP 8.2)
 
 ### Naming Conventions
 - Classes: PascalCase (`PhotoController`, `CloudinaryService`)
@@ -119,12 +112,9 @@ export function PhotoCard({ photo, onDelete, className }: PhotoCardProps) {
 - Use route model binding
 
 ```php
-// ✅ Correct
 class PhotoController extends Controller
 {
-    public function __construct(
-        private CloudinaryService $cloudinary
-    ) {}
+    public function __construct(private CloudinaryService $cloudinary) {}
 
     public function store(UploadPhotoRequest $request)
     {
@@ -134,25 +124,17 @@ class PhotoController extends Controller
 }
 ```
 
-### Service Layer
+### Service Layer & Validation
 - Extract business logic to services
 - Use dependency injection (constructor property promotion)
 - Type hint all parameters and return types
+- Form Request classes for all inputs with clear validation rules
 
-### Validation
-- Form Request classes for all inputs
-- Clear validation rules and error messages
-- Validate file types, sizes, dimensions
-
-### API Responses
-- Use Laravel API Resources
+### API Responses & Database
+- Use Laravel API Resources for consistent JSON responses
 - Include proper HTTP status codes
-- Consistent response structure
-
-### Database
 - Use migrations for schema changes
 - Add indexes for queried columns
-- Use query scopes for common queries
 - Eager load relationships (avoid N+1)
 
 ---
@@ -163,18 +145,11 @@ class PhotoController extends Controller
 - **Theme**: "Elegante Celebration" - Gold (#d4af37), Champagne (#f7e7ce), Black
 - **Fonts**: Playfair Display (headings), system-ui (body)
 - **Components**: shadcn/ui as base, extend for party features
-- **Spacing**: Tailwind scale (4px base unit)
-
-### Animation (framer-motion)
-- Keep interactions under 300ms
-- Staggered grid entries for photos
-- Smooth transitions for modals
-- Respect `prefers-reduced-motion`
+- **Animation**: framer-motion (keep under 300ms, respect `prefers-reduced-motion`)
 
 ### Accessibility
 - Semantic HTML (`<button>`, `<label>`)
 - Alt text for images
-- Keyboard navigation support
 - WCAG AA contrast ratios
 - Min tappable size: 44x44px
 
@@ -209,7 +184,6 @@ class PhotoController extends Controller
 - Feature tests for endpoints
 - Unit tests for services
 - Mock external services (Cloudinary)
-- Test validation thoroughly
 - Use database transactions
 
 ---
@@ -217,7 +191,6 @@ class PhotoController extends Controller
 ## Available Skills
 
 ```bash
-# Load skills before development
 skill vercel-react-best-practices  # React performance (57 rules)
 skill frontend-design               # UI/UX guidance
 skill laravel-specialist            # Laravel 10+ best practices
