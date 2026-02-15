@@ -11,7 +11,7 @@ export function UploadButton({ onClick }: UploadButtonProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex justify-center py-8"
+      className="flex justify-center py-3"
     >
       <Button
         onClick={onClick}

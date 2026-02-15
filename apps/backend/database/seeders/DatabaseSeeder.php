@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             GuestSessionSeeder::class,
+            AdminSeeder::class,
+            PartyTokenSeeder::class,
         ]);
 
         // User::factory(10)->create();
