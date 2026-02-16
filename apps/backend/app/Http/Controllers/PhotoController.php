@@ -19,6 +19,7 @@ class PhotoController extends Controller
     {
         $photos = Photo::approved()
             ->recent()
+            ->with('guestSession:id,guest_name')
             ->get();
 
         return response()->json(PhotoResource::collection($photos));

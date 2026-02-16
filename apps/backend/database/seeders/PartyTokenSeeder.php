@@ -10,15 +10,17 @@ class PartyTokenSeeder extends Seeder
 {
     public function run(): void
     {
-        $token = Str::random(64);
+        $token = env('PARTYSNAP_QR_TOKEN') ?: Str::random(64);
 
-        PartyToken::create([
-            'id' => Str::uuid(),
-            'token' => $token,
-            'event_name' => 'PartySnap Event',
-            'expires_at' => now()->addDays(3),
-            'is_active' => true,
-        ]);
+        PartyToken::updateOrCreate(
+            ['token' => $token],
+            [
+                'id' => Str::uuid(),
+                'event_name' => 'PartySnap Event - Los 50 de Joseta',
+                'expires_at' => null,
+                'is_active' => true,
+            ]
+        );
 
         $this->command->newLine(2);
         $this->command->info('==================================================');
@@ -26,7 +28,11 @@ class PartyTokenSeeder extends Seeder
         $this->command->line("  <fg=cyan;options=bold>{$token}</>");
         $this->command->newLine();
         $this->command->info('  📱 URL para QR Code:');
-        $this->command->line("  <fg=green>http://localhost:5173/?token={$token}</>");
+        $this->command->line("  <fg=green>http://localhost:3000/?token={$token}</>");
+        $this->command->newLine();
+        $this->command->info('  👥 Evento: PartySnap Event - Los 50 de Joseta');
+        $this->command->info('  🔒 Tipo: ' . (env('PARTYSNAP_QR_TOKEN') ? 'Personalizado (.env)' : 'Aleatorio'));
+        $this->command->info('  ⏰ Expira: Nunca (evento permanente)');
         $this->command->info('==================================================');
         $this->command->newLine();
     }

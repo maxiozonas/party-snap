@@ -12,7 +12,7 @@ import { useGuestSession } from '@/hooks/use-guest-session';
 
 export function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const { photos, isLoading, error, mutate } = usePhotos();
+  const { photos, isLoading, error, mutate } = usePhotos('slow');
   const { settings } = useSettings();
   const { isValid: hasGuestSession, isLoading: isSessionLoading } = useGuestSession();
 

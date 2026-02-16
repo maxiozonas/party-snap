@@ -1,20 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePhotos } from '@/hooks/use-photos';
-import { usePhotoStream } from '@/hooks/use-photo-stream';
 
 export function TVMode() {
-  const { photos, mutate } = usePhotos(false);
+  const { photos } = usePhotos('fast');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [initialized, setInitialized] = useState(false);
   const lastPhotoCountRef = useRef(0);
-
-  usePhotoStream({
-    onNewPhotos: () => {
-      console.log('📸 Nuevas fotos detectadas - Actualizando slideshow...');
-      mutate();
-    },
-  });
 
   useEffect(() => {
     if (photos.length > 0 && !initialized) {

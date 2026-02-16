@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     const token = searchParams.get('token');
     
-    if (token && token.length === 64) {
+    if (token && token.length > 0) {
       if (!isValid && !guestName) {
         setTokenFromUrl(token);
         setShowNameModal(true);

@@ -14,7 +14,7 @@ class CreateGuestSessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string|size:64',
+            'token' => 'required|string|min:1',
             'guest_name' => 'required|string|min:2|max:100',
         ];
     }
@@ -23,7 +23,7 @@ class CreateGuestSessionRequest extends FormRequest
     {
         return [
             'token.required' => 'El token es requerido.',
-            'token.size' => 'Token inválido.',
+            'token.min' => 'El token es requerido.',
             'guest_name.required' => 'Por favor, ingresa tu nombre.',
             'guest_name.min' => 'El nombre debe tener al menos 2 caracteres.',
             'guest_name.max' => 'El nombre no puede exceder 100 caracteres.',

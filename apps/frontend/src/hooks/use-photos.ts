@@ -4,12 +4,15 @@ import type { Photo } from '../types';
 
 const fetcher = () => photosApi.getAll().then(res => res.data);
 
-export const usePhotos = (polling = true) => {
+export const usePhotos = (pollingInterval: 'slow' | 'fast' | false = 'slow') => {
   const { data, error, mutate } = useSWR<Photo[]>(
     '/photos',
     fetcher,
-    polling ? { 
-      refreshInterval: 10000,
+    pollingInterval === 'fast' ? { 
+      refreshInterval: 5000,
+      revalidateOnFocus: false,
+    } : pollingInterval === 'slow' ? {
+      refreshInterval: 20000,
       revalidateOnFocus: false,
     } : {}
   );

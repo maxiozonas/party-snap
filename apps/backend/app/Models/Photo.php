@@ -33,7 +33,7 @@ class Photo extends Model
 
     public function scopeRecent(Builder $query): Builder
     {
-        return $query->orderBy('created_at', 'desc');
+        return $query->orderBy('created_at', 'asc');
     }
 
     public function scopeWithSession(Builder $query): Builder
