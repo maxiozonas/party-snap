@@ -10,10 +10,13 @@ interface GuestSessionState {
 }
 
 export function useGuestSession() {
+  const storedToken = localStorage.getItem('guest_token');
+  const storedGuestName = localStorage.getItem('guest_name');
+
   const [state, setState] = useState<GuestSessionState>({
-    token: null,
-    guestName: null,
-    isValid: false,
+    token: storedToken,
+    guestName: storedGuestName,
+    isValid: Boolean(storedToken && storedGuestName),
     isLoading: true,
     error: null,
   });
@@ -23,19 +26,19 @@ export function useGuestSession() {
   }, []);
 
   const validateSession = async () => {
-    const storedToken = localStorage.getItem('guest_token');
+    const currentToken = localStorage.getItem('guest_token');
 
-    if (!storedToken) {
+    if (!currentToken) {
       setState(prev => ({ ...prev, isLoading: false }));
       return;
     }
 
     try {
-      const response = await sessionsApi.validate(storedToken);
+      const response = await sessionsApi.validate(currentToken);
 
       if (response.data.valid && response.data.guest_name) {
         setState({
-          token: storedToken,
+          token: currentToken,
           guestName: response.data.guest_name,
           isValid: true,
           isLoading: false,

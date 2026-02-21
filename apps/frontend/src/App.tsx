@@ -34,7 +34,18 @@ function App() {
       return;
     }
 
+    const persistedToken = localStorage.getItem('guest_token');
+    const persistedGuestName = localStorage.getItem('guest_name');
+    const hasPersistedSession = Boolean(persistedToken && persistedGuestName);
+
     if (token && token.length > 0) {
+      if (hasPersistedSession) {
+        setTokenFromUrl(null);
+        setShowNameModal(false);
+        window.history.replaceState({}, '', pathname);
+        return;
+      }
+
       if (!isValid && !guestName) {
         setTokenFromUrl(token);
         setShowNameModal(true);
