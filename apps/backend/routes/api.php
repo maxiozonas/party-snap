@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('/photos', [PhotoController::class, 'index']);
+    Route::get('/photos/feed', [PhotoController::class, 'feed']);
     Route::post('/upload', [PhotoController::class, 'store']);
     Route::delete('/admin/photo/{photo}', [PhotoController::class, 'destroy']);
     // Route::get('/photos/stream', [PhotoStreamController::class, 'stream']); // Desactivado - usando polling

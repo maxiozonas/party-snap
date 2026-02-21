@@ -6,9 +6,10 @@ import type { Photo } from '@/types';
 interface PhotoGridProps {
   readonly photos: readonly Photo[];
   onImageError?: (id: string) => void;
+  onPhotoClick?: (id: string) => void;
 }
 
-export const PhotoGrid = memo(function PhotoGrid({ photos, onImageError }: PhotoGridProps) {
+export const PhotoGrid = memo(function PhotoGrid({ photos, onImageError, onPhotoClick }: PhotoGridProps) {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -46,6 +47,7 @@ export const PhotoGrid = memo(function PhotoGrid({ photos, onImageError }: Photo
           key={photo.id}
           photo={photo}
           onImageError={onImageError}
+          onClick={onPhotoClick}
         />
       ))}
     </motion.div>

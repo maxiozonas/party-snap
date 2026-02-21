@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Photo, PartySettings, CreateGuestSessionResponse, ValidateGuestSessionResponse } from '@/types';
+import type { Photo, PhotoFeedResponse, PartySettings, CreateGuestSessionResponse, ValidateGuestSessionResponse } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -28,6 +28,13 @@ api.interceptors.request.use((config) => {
 
 export const photosApi = {
   getAll: () => api.get<Photo[]>('/photos'),
+  getFeed: (limit = 10, cursor?: string) =>
+    api.get<PhotoFeedResponse>('/photos/feed', {
+      params: {
+        limit,
+        ...(cursor ? { cursor } : {}),
+      },
+    }),
   upload: (data: FormData) => api.post('/upload', data, {
     headers: {
       'Content-Type': 'multipart/form-data',

@@ -5,6 +5,12 @@ export interface Photo {
   created_at: string;
 }
 
+export interface PhotoFeedResponse {
+  data: Photo[];
+  has_more: boolean;
+  next_cursor: string | null;
+}
+
 export interface PartySettings {
   id?: number;
   title: string;
