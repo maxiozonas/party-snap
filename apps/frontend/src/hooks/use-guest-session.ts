@@ -71,11 +71,13 @@ export function useGuestSession() {
       const response = await sessionsApi.create({ master_token: token, guest_name: guestName });
 
       if (response.data.valid) {
-        localStorage.setItem('guest_token', token);
+        const sessionToken = response.data.session_token || token;
+
+        localStorage.setItem('guest_token', sessionToken);
         localStorage.setItem('guest_name', guestName);
 
         setState({
-          token,
+          token: sessionToken,
           guestName: response.data.guest_name,
           isValid: true,
           isLoading: false,
