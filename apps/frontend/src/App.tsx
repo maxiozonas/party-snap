@@ -12,7 +12,7 @@ function App() {
   const [searchParams, setSearchParams] = useState(
     new URLSearchParams(window.location.search)
   );
-  const { isValid, isLoading: sessionLoading, guestName } = useGuestSession();
+  const { isLoading: sessionLoading, refreshSession } = useGuestSession();
   const { isAuthenticated, isLoading: adminLoading, logout } = useAdminAuth();
   const [showNameModal, setShowNameModal] = useState(false);
   const [tokenFromUrl, setTokenFromUrl] = useState<string | null>(null);
@@ -30,23 +30,20 @@ function App() {
   useEffect(() => {
     const token = searchParams.get('token');
 
-    if (!token || token.length === 0 || sessionLoading) {
+    if (!token || token.length === 0) {
       return;
     }
 
-    const persistedToken = localStorage.getItem('guest_token');
-    const persistedGuestName = localStorage.getItem('guest_name');
-    const hasPersistedSession = Boolean(persistedToken && persistedGuestName);
+    let cancelled = false;
 
-    if (token && token.length > 0) {
-      if (hasPersistedSession) {
-        setTokenFromUrl(null);
-        setShowNameModal(false);
-        window.history.replaceState({}, '', pathname);
+    const verifySessionThenResolveToken = async () => {
+      const hasValidSession = await refreshSession();
+
+      if (cancelled) {
         return;
       }
 
-      if (!isValid && !guestName) {
+      if (!hasValidSession) {
         setTokenFromUrl(token);
         setShowNameModal(true);
       } else {
@@ -55,8 +52,15 @@ function App() {
       }
 
       window.history.replaceState({}, '', pathname);
-    }
-  }, [searchParams, sessionLoading, isValid, guestName, pathname]);
+      setSearchParams(new URLSearchParams(window.location.search));
+    };
+
+    void verifySessionThenResolveToken();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, pathname, refreshSession]);
 
   if (sessionLoading) {
     return (

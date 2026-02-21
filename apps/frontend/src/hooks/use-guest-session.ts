@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { sessionsApi } from '@/lib/api';
 
 interface GuestSessionState {
@@ -9,9 +9,19 @@ interface GuestSessionState {
   error: string | null;
 }
 
+const readStoredToken = () => localStorage.getItem('guest_token') || localStorage.getItem('guesttoken');
+const readStoredGuestName = () => localStorage.getItem('guest_name') || localStorage.getItem('guestname');
+
+const clearStoredSession = () => {
+  localStorage.removeItem('guest_token');
+  localStorage.removeItem('guest_name');
+  localStorage.removeItem('guesttoken');
+  localStorage.removeItem('guestname');
+};
+
 export function useGuestSession() {
-  const storedToken = localStorage.getItem('guest_token');
-  const storedGuestName = localStorage.getItem('guest_name');
+  const storedToken = readStoredToken();
+  const storedGuestName = readStoredGuestName();
 
   const [state, setState] = useState<GuestSessionState>({
     token: storedToken,
@@ -21,22 +31,31 @@ export function useGuestSession() {
     error: null,
   });
 
-  useEffect(() => {
-    validateSession();
-  }, []);
+  const validateSession = useCallback(async (): Promise<boolean> => {
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-  const validateSession = async () => {
-    const currentToken = localStorage.getItem('guest_token');
+    const currentToken = readStoredToken();
+    const currentGuestName = readStoredGuestName();
 
     if (!currentToken) {
-      setState(prev => ({ ...prev, isLoading: false }));
-      return;
+      setState(prev => ({
+        ...prev,
+        token: null,
+        guestName: null,
+        isValid: false,
+        isLoading: false,
+      }));
+
+      return false;
     }
 
     try {
       const response = await sessionsApi.validate(currentToken);
 
       if (response.data.valid && response.data.guest_name) {
+        localStorage.setItem('guest_token', currentToken);
+        localStorage.setItem('guest_name', response.data.guest_name);
+
         setState({
           token: currentToken,
           guestName: response.data.guest_name,
@@ -44,9 +63,11 @@ export function useGuestSession() {
           isLoading: false,
           error: null,
         });
+
+        return true;
       } else {
-        localStorage.removeItem('guest_token');
-        localStorage.removeItem('guest_name');
+        clearStoredSession();
+
         setState({
           token: null,
           guestName: null,
@@ -54,11 +75,26 @@ export function useGuestSession() {
           isLoading: false,
           error: response.data.message || 'Sesión expirada',
         });
+
+        return false;
       }
     } catch (error) {
       console.error('Error validating session:', error);
-      localStorage.removeItem('guest_token');
-      localStorage.removeItem('guest_name');
+
+      if (currentToken && currentGuestName) {
+        setState({
+          token: currentToken,
+          guestName: currentGuestName,
+          isValid: true,
+          isLoading: false,
+          error: null,
+        });
+
+        return true;
+      }
+
+      clearStoredSession();
+
       setState({
         token: null,
         guestName: null,
@@ -66,8 +102,14 @@ export function useGuestSession() {
         isLoading: false,
         error: 'Error al validar sesión',
       });
+
+      return false;
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void validateSession();
+  }, [validateSession]);
 
   const createSession = async (token: string, guestName: string) => {
     try {
@@ -98,8 +140,8 @@ export function useGuestSession() {
   };
 
   const clearSession = () => {
-    localStorage.removeItem('guest_token');
-    localStorage.removeItem('guest_name');
+    clearStoredSession();
+
     setState({
       token: null,
       guestName: null,
